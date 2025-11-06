@@ -16,6 +16,7 @@ variable "task_definition_arn" {
 variable "desired_count" {
   description = "Desired number of ECS tasks"
   type        = number
+  default     = 1
 }
 
 variable "private_subnet_ids" {

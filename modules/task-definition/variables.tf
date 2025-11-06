@@ -3,6 +3,11 @@ variable "family" {
   type        = string
 }
 
+variable "log_group" {
+  description = "The cloudwatch log group name"
+  type        = string
+}
+
 variable "cpu" {
   description = "The number of CPU units used by the task"
   type        = number

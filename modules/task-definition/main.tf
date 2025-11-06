@@ -1,3 +1,13 @@
+# Create the log group for the ECS task
+resource "aws_cloudwatch_log_group" "logs" {
+  name              = "/${var.log_group}/${var.family}"
+  retention_in_days = 1 # You can adjust this as needed
+
+  tags = {
+    Name = "${var.log_group}-log-group"
+  }
+}
+
 resource "aws_ecs_task_definition" "this" {
   family                   = var.family
   requires_compatibilities = ["FARGATE"]
@@ -22,7 +32,7 @@ resource "aws_ecs_task_definition" "this" {
         }
       ],
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:3000/welcome || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
@@ -31,7 +41,7 @@ resource "aws_ecs_task_definition" "this" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "/ecs/${var.family}"
+          awslogs-group         = aws_cloudwatch_log_group.logs.name
           awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }

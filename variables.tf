@@ -1,25 +1,25 @@
 variable "container_name" {
   description = "Name of the container"
   type        = string
-  default     = "crypto-app"
+  default     = "nest-app"
 }
 
 variable "container_image" {
   description = "Docker image to deploy"
   type        = string
-  default     = "377027906194.dkr.ecr.us-east-1.amazonaws.com/crypto-project:ba75ec4"
+  default     = "619316659327.dkr.ecr.us-east-1.amazonaws.com/terraform-rnd-app/backend:dev"
 }
 
 variable "container_port" {
   description = "Port the container listens on"
   type        = number
-  default     = 5000
+  default     = 3000
 }
 
 variable "desired_count" {
   description = "Number of ECS tasks to run"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "cpu" {
@@ -44,4 +44,10 @@ variable "environment" {
   description = "Environment name (e.g., dev, staging, prod)"
   type        = string
   default     = "dev"
+}
+
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+  default     = "terraform-rnd-app"
 }

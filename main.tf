@@ -1,11 +1,40 @@
 provider "aws" {
-  region = "us-east-1"  # 👈 set your desired region here
+  region = var.region  # 👈 set your desired region here
+
+  default_tags {
+    tags = {
+      Environment = var.environment
+      Name = var.project_name
+    }
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+# ECR Repositories
+resource "aws_ecr_repository" "backend" {
+  name = "${var.project_name}/backend"
+
+  # Optional: Keep images from being deleted accidentally
+  # image_scanning_configuration {
+  #   scan_on_push = true
+  # }
+
+  force_delete = true
+
+  # Optional: Keep untagged images, 'untagged' is the default
+  image_tag_mutability = "MUTABLE"
+
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
 }
 
 module "vpc" {
   source = "./modules/vpc"
 
-  name_prefix          = "ecs"
+  name_prefix          = "${var.project_name}-${var.environment}"
   vpc_cidr             = "10.0.0.0/16"
   azs                  = ["us-east-1a", "us-east-1b"]
   public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
@@ -15,7 +44,7 @@ module "vpc" {
 module "alb_sg" {
   source = "./modules/security-group"
 
-  name   = "alb-sg"
+  name   = "${var.project_name}-${var.environment}-alb-sg"
   vpc_id = module.vpc.vpc_id
 
   ingress_rules = [
@@ -32,7 +61,7 @@ module "alb_sg" {
 module "ecs_sg" {
   source = "./modules/security-group"
 
-  name   = "ecs-tasks-sg"
+  name   = "${var.project_name}-${var.environment}-ecs-tasks-sg"
   vpc_id = module.vpc.vpc_id
 
   ingress_rules = [
@@ -49,7 +78,7 @@ module "ecs_sg" {
 
 module "iam" {
   source                   = "./modules/iam"
-  name_prefix              = "ecs"
+  name_prefix              = "${var.project_name}-${var.environment}"
   attach_cloudwatch_policy = true
   attach_ssm_policy        = false
   create_custom_task_policy = true
@@ -68,8 +97,8 @@ module "iam" {
         ],
         Effect   = "Allow",
         Resource = [
-          "arn:aws:logs:<REGION>:<ACCOUNT_ID>:log-group:/aws/ecs/*",
-          "arn:aws:logs:<REGION>:<ACCOUNT_ID>:log-group:/aws/ecs/*:log-stream:*"
+          "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/*",
+          "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/*:log-stream:*"
         ]
       },
       {
@@ -95,8 +124,8 @@ module "iam" {
         ],
         Effect   = "Allow",
         Resource = [
-          "arn:aws:s3:::my-secure-bucket",
-          "arn:aws:s3:::my-secure-bucket/*"
+          "arn:aws:s3:::rnd-ecs-terraform-state",
+          "arn:aws:s3:::rnd-ecs-terraform-state/*"
         ]
       }
     ]
@@ -106,8 +135,8 @@ module "iam" {
 
 module "ecs" {
   source      = "./modules/ecs"
-  name_prefix = "ecs"
-  environment = "dev"
+  name_prefix = "${var.project_name}-${var.environment}"
+  environment = var.environment
 
   enable_container_insights = true
 
@@ -127,6 +156,7 @@ module "ecs_task_definition" {
   source             = "./modules/task-definition"
 
   family             = var.container_name
+  log_group          = var.project_name
   cpu                = var.cpu
   memory             = var.memory
   container_name     = var.container_name
@@ -141,7 +171,7 @@ module "ecs_task_definition" {
 module "ecs_service" {
   source                         = "./modules/ecs_service"
 
-  name_prefix                    = "ecs"
+  name_prefix                    = "${var.project_name}-${var.environment}"
   cluster_id                     = module.ecs.cluster_id
   task_definition_arn           = module.ecs_task_definition.task_definition_arn
   desired_count                 = var.desired_count
@@ -160,7 +190,7 @@ module "ecs_service" {
 
 module "alb" {
   source              = "./modules/alb"
-  name_prefix         = "ecs"
+  name_prefix         = "${var.project_name}-${var.environment}"
   vpc_id              = module.vpc.vpc_id
   public_subnet_ids   = module.vpc.public_subnet_ids
   security_group_ids  = [module.alb_sg.security_group_id]

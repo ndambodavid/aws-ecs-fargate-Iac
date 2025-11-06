@@ -5,6 +5,11 @@ terraform.tfstate.backup
 # Ignore crash logs
 crash.log
 
+# Ignore log files
+*.log
+*.tfplan
+*.txt
+
 # Ignore .terraform directory
 .terraform/
 
