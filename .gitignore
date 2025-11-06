@@ -12,6 +12,7 @@ crash.log
 
 # Ignore .terraform directory
 .terraform/
+.idea/
 
 # Ignore override files and logs
 *.tfstate.*
