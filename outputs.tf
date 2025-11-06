@@ -5,5 +5,30 @@ output "alb_endpoint" {
 
 output "ecr_repository_url" {
   description = "The URL of the ECR repository"
-  value       = aws_ecr_repository.backend.repository_url
+  value       = module.ecr.repository_url
+}
+
+output "ecs_cluster_id" {
+  description = "ECS cluster id"
+  value       = module.ecs.cluster_id
+}
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = module.ecs.cluster_name
+}
+
+output "ecs_service_id" {
+  description = "ECS service id"
+  value       = module.ecs_service.service_id
+}
+
+output "ecs_service_name" {
+  description = "ECS service name"
+  value       = module.ecs_service.service_name
+}
+
+output "ecs_task_family" {
+  description = "ECS task family"
+  value        = module.ecs_task_definition.task_definition_family
 }

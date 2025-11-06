@@ -13,6 +13,12 @@ variable "task_definition_arn" {
   type        = string
 }
 
+# ADD THIS
+variable "task_definition_family" {
+  description = "The family of the task definition to run."
+  type        = string
+}
+
 variable "desired_count" {
   description = "Desired number of ECS tasks"
   type        = number

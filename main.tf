@@ -11,24 +11,11 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-# ECR Repositories
-resource "aws_ecr_repository" "backend" {
-  name = "${var.project_name}/backend"
-
-  # Optional: Keep images from being deleted accidentally
-  # image_scanning_configuration {
-  #   scan_on_push = true
-  # }
-
-  force_delete = true
-
-  # Optional: Keep untagged images, 'untagged' is the default
-  image_tag_mutability = "MUTABLE"
-
-  tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-  }
+# 1. NEW: Add the ECR module
+module "ecr" {
+  source = "./modules/ecr"
+  project_name = var.project_name
+  environment = var.environment
 }
 
 module "vpc" {
@@ -174,6 +161,7 @@ module "ecs_service" {
   name_prefix                    = "${var.project_name}-${var.environment}"
   cluster_id                     = module.ecs.cluster_id
   task_definition_arn           = module.ecs_task_definition.task_definition_arn
+  task_definition_family         = module.ecs_task_definition.task_definition_family
   desired_count                 = var.desired_count
   target_group_arn              = module.alb.target_group_arn
   container_name                = var.container_name
