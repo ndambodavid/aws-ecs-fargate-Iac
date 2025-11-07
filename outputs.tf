@@ -8,6 +8,11 @@ output "ecr_repository_url" {
   value       = module.ecr.repository_url
 }
 
+output "s3_artifact_url" {
+  description = "The url of the s3 artifact bucket"
+  value = module.s3_artifacts.bucket_path
+}
+
 output "ecs_cluster_id" {
   description = "ECS cluster id"
   value       = module.ecs.cluster_id

@@ -185,3 +185,11 @@ module "alb" {
   target_port         = var.container_port
   environment         = var.environment
 }
+
+# NEW: Call the S3 module to create the artifact bucket
+module "s3_artifacts" {
+  source = "./modules/s3"
+
+  bucket_name = "${var.project_name}-artifacts"     # e.g., "ecs-artifacts"
+  key_prefix  = "${var.environment}-builds"       # e.g., "dev-builds"
+}
