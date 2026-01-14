@@ -33,6 +33,11 @@ variable "create_custom_execution_policy" {
   default     = false
 }
 
+variable "aws_secret_arns" {
+  description = "Aws secrets arns"
+  type = map(string)
+}
+
 variable "custom_execution_policy_json" {
   description = "Custom execution role policy JSON"
   type        = string

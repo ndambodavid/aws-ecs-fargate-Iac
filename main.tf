@@ -12,11 +12,11 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 # 1. NEW: Add the ECR module
-module "ecr" {
-  source = "./modules/ecr"
-  project_name = var.project_name
-  environment = var.environment
-}
+# module "ecr" {
+#   source = "./modules/ecr"
+#   project_name = var.project_name
+#   environment = var.environment
+# }
 
 module "vpc" {
   source = "./modules/vpc"
@@ -117,6 +117,8 @@ module "iam" {
       }
     ]
   })
+
+  aws_secret_arns = module.secrets.secret_arns
 }
 
 
@@ -153,6 +155,8 @@ module "ecs_task_definition" {
 
   execution_role_arn = module.iam.ecs_execution_role_arn
   task_role_arn      = module.iam.ecs_task_role_arn
+  aws_secret_arns = module.secrets
+  environment_vars = var.app_env_vars
 }
 
 module "ecs_service" {
@@ -192,4 +196,14 @@ module "s3_artifacts" {
 
   bucket_name = "${var.project_name}-artifacts"     # e.g., "ecs-artifacts"
   key_prefix  = "${var.environment}-builds"       # e.g., "dev-builds"
+}
+
+module "secrets" {
+  source          = "./modules/secrets_manager"
+  project_name    = var.project_name
+  environment     = var.environment
+  sensitive_keys  = local.sensitive_keys
+  secret_defaults = var.secret_defaults
+  # Reference the local file path
+  gcp_key_file_path = "${path.root}/../../google-gcp-key-dev.json"
 }

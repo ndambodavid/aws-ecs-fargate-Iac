@@ -23,6 +23,28 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# 3. Grant Permissions: Secrets Manager Access
+# Added this to allow the ECS Agent to fetch secrets defined in Task Definition
+resource "aws_iam_role_policy" "ecs_execution_secrets" {
+  name = "${var.name_prefix}-execution-secrets"
+  role = aws_iam_role.ecs_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = [
+        "secretsmanager:GetSecretValue",
+        "ssm:GetParameters",
+        "kms:Decrypt"
+      ],
+      Resource = [
+        values(var.aws_secret_arns)
+      ] # Ideally, scope this to specific secret ARNs
+    }]
+  })
+}
+
 # Optional: Attach logging or secret access policies
 resource "aws_iam_role_policy_attachment" "logs_policy" {
   count      = var.attach_cloudwatch_policy ? 1 : 0

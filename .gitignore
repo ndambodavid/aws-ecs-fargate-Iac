@@ -21,6 +21,9 @@ crash.log
 *.override.tf
 *.override.tf.json
 
+#gcp keys
+google-gcp-key-dev.json
+
 # Ignore sensitive or temporary files
 *.bak
 *.tmp

@@ -46,6 +46,19 @@ resource "aws_ecs_task_definition" "this" {
           awslogs-stream-prefix = "ecs"
         }
       }
+      # 🚀 Dynamic Injection of Standard Variables
+      # Standard Env Vars
+      environment = [
+        for k, v in var.environment_vars : { name = k, value = v }
+      ]
+
+      # 🔐 Dynamic Injection of Secrets
+      secrets = [
+        for k, arn in var.aws_secret_arns : {
+          name      = k
+          valueFrom = arn
+        }
+      ]
     }
   ])
 }

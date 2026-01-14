@@ -47,3 +47,13 @@ variable "region" {
   description = "AWS region where the ECS service is deployed (used for logs)"
   type        = string
 }
+
+variable "aws_secret_arns" {
+  description = "sensitive secret arns"
+  type = map(string)
+}
+
+variable "environment_vars" {
+  description = "non sensitive vars"
+  type = map(string)
+}

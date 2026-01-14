@@ -51,3 +51,11 @@ variable "project_name" {
   type        = string
   default     = "terraform-rnd-app"
 }
+
+variable "secret_defaults" {
+  type = map(string)
+}
+
+variable "app_env_vars" {
+  type = map(string)
+}
