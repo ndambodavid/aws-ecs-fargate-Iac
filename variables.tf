@@ -7,7 +7,7 @@ variable "container_name" {
 variable "container_image" {
   description = "Docker image to deploy"
   type        = string
-  default     = "619316659327.dkr.ecr.us-east-1.amazonaws.com/terraform-rnd-app/backend:dev"
+  default     = "619316659327.dkr.ecr.us-east-1.amazonaws.com/terraform-rnd-app/backend:latest"
 }
 
 variable "container_port" {
