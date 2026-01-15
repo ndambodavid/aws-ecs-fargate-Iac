@@ -155,7 +155,7 @@ module "ecs_task_definition" {
 
   execution_role_arn = module.iam.ecs_execution_role_arn
   task_role_arn      = module.iam.ecs_task_role_arn
-  aws_secret_arns = module.secrets
+  aws_secret_arns = module.secrets.secret_arns
   environment_vars = var.app_env_vars
 }
 
@@ -205,5 +205,5 @@ module "secrets" {
   sensitive_keys  = local.sensitive_keys
   secret_defaults = var.secret_defaults
   # Reference the local file path
-  gcp_key_file_path = "${path.root}/../../google-gcp-key-dev.json"
+  gcp_key_file_path = "${path.root}/google-gcp-key-dev.json"
 }

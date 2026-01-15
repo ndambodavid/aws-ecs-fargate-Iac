@@ -32,11 +32,11 @@ resource "aws_ecs_task_definition" "this" {
         }
       ],
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:3000/welcome || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://[::1]:3000/api/health || exit 1"]
         interval    = 30
-        timeout     = 5
+        timeout     = 10
         retries     = 3
-        startPeriod = 60
+        startPeriod = 120
       },
       logConfiguration = {
         logDriver = "awslogs",

@@ -3,10 +3,10 @@ output "alb_endpoint" {
   value       = module.alb.alb_dns_name
 }
 
-output "ecr_repository_url" {
-  description = "The URL of the ECR repository"
-  value       = module.ecr.repository_url
-}
+# output "ecr_repository_url" {
+#   description = "The URL of the ECR repository"
+#   value       = module.ecr.repository_url
+# }
 
 output "s3_artifact_url" {
   description = "The url of the s3 artifact bucket"

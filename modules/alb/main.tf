@@ -19,14 +19,14 @@ resource "aws_lb_target_group" "this" {
   target_type = "ip"
   
   health_check {
-    path                = "/"
+    path                = "/api/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     interval            = 30
-    timeout             = 5
+    timeout             = 10
     healthy_threshold   = 2
     unhealthy_threshold = 3
-    matcher             = "200"
+    matcher             = "200-299"
   }
 }
 

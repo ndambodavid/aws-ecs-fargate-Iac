@@ -38,9 +38,7 @@ resource "aws_iam_role_policy" "ecs_execution_secrets" {
         "ssm:GetParameters",
         "kms:Decrypt"
       ],
-      Resource = [
-        values(var.aws_secret_arns)
-      ] # Ideally, scope this to specific secret ARNs
+      Resource = values(var.aws_secret_arns) # Ideally, scope this to specific secret ARNs
     }]
   })
 }
