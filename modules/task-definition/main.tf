@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "this" {
         }
       ],
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://[::1]:3000/api/health || exit 1"]
+        command     = ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/health || exit 1"]
         interval    = 30
         timeout     = 10
         retries     = 3

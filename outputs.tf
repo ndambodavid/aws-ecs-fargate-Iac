@@ -37,3 +37,20 @@ output "ecs_task_family" {
   description = "ECS task family"
   value        = module.ecs_task_definition.task_definition_family
 }
+
+# --- VPC outputs for Kafka VPC peering ---
+
+output "app_vpc_id" {
+  description = "App VPC ID (pass to Kafka project as app_vpc_id)"
+  value       = module.vpc.vpc_id
+}
+
+output "app_vpc_cidr" {
+  description = "App VPC CIDR block (pass to Kafka project as app_vpc_cidr)"
+  value       = module.vpc.vpc_cidr
+}
+
+output "app_vpc_private_route_table_ids" {
+  description = "Private route table IDs (pass to Kafka project as app_vpc_route_table_ids)"
+  value       = module.vpc.private_route_table_ids
+}

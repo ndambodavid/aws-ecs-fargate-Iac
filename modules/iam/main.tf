@@ -25,9 +25,11 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
 
 # 3. Grant Permissions: Secrets Manager Access
 # Added this to allow the ECS Agent to fetch secrets defined in Task Definition
+# Only create this policy if there are secrets to access
 resource "aws_iam_role_policy" "ecs_execution_secrets" {
-  name = "${var.name_prefix}-execution-secrets"
-  role = aws_iam_role.ecs_execution.id
+  count = length(var.aws_secret_arns) > 0 ? 1 : 0
+  name  = "${var.name_prefix}-execution-secrets"
+  role  = aws_iam_role.ecs_execution.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -38,7 +40,7 @@ resource "aws_iam_role_policy" "ecs_execution_secrets" {
         "ssm:GetParameters",
         "kms:Decrypt"
       ],
-      Resource = values(var.aws_secret_arns) # Ideally, scope this to specific secret ARNs
+      Resource = values(var.aws_secret_arns)
     }]
   })
 }

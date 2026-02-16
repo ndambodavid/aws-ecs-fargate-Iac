@@ -22,10 +22,10 @@ module "vpc" {
   source = "./modules/vpc"
 
   name_prefix          = "${var.project_name}-${var.environment}"
-  vpc_cidr             = "10.0.0.0/16"
+  vpc_cidr             = "10.1.0.0/16"
   azs                  = ["us-east-1a", "us-east-1b"]
-  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs = ["10.0.11.0/24", "10.0.12.0/24"]
+  public_subnet_cidrs  = ["10.1.1.0/24", "10.1.2.0/24"]
+  private_subnet_cidrs = ["10.1.11.0/24", "10.1.12.0/24"]
 }
 
 module "alb_sg" {
@@ -202,7 +202,7 @@ module "secrets" {
   source          = "./modules/secrets_manager"
   project_name    = var.project_name
   environment     = var.environment
-  sensitive_keys  = local.sensitive_keys
+  sensitive_keys  = var.sensitive_keys
   secret_defaults = var.secret_defaults
   # Reference the local file path
   gcp_key_file_path = "${path.root}/google-gcp-key-dev.json"

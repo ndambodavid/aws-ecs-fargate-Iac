@@ -22,3 +22,13 @@ output "internet_gateway_id" {
   description = "Internet Gateway ID"
   value       = aws_internet_gateway.igw.id
 }
+
+output "vpc_cidr" {
+  description = "The VPC CIDR block"
+  value       = aws_vpc.main.cidr_block
+}
+
+output "private_route_table_ids" {
+  description = "List of private route table IDs"
+  value       = aws_route_table.private[*].id
+}
