@@ -1,10 +1,10 @@
 provider "aws" {
-  region = var.region  # 👈 set your desired region here
+  region = var.region # 👈 set your desired region here
 
   default_tags {
     tags = {
       Environment = var.environment
-      Name = var.project_name
+      Name        = var.project_name
     }
   }
 }
@@ -40,6 +40,12 @@ module "alb_sg" {
       to_port     = 80
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
   # Default egress is already set to allow all outbound traffic
@@ -64,12 +70,12 @@ module "ecs_sg" {
 }
 
 module "iam" {
-  source                   = "./modules/iam"
-  name_prefix              = "${var.project_name}-${var.environment}"
-  attach_cloudwatch_policy = true
-  attach_ssm_policy        = false
+  source                    = "./modules/iam"
+  name_prefix               = "${var.project_name}-${var.environment}"
+  attach_cloudwatch_policy  = true
+  attach_ssm_policy         = false
   create_custom_task_policy = true
-  
+
   # Add custom policy for execution role
   create_custom_execution_policy = true
   custom_execution_policy_json = jsonencode({
@@ -82,7 +88,7 @@ module "iam" {
           "logs:PutLogEvents",
           "logs:DescribeLogStreams"
         ],
-        Effect   = "Allow",
+        Effect = "Allow",
         Resource = [
           "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/*",
           "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/*:log-stream:*"
@@ -109,7 +115,7 @@ module "iam" {
           "s3:GetObject",
           "s3:ListBucket"
         ],
-        Effect   = "Allow",
+        Effect = "Allow",
         Resource = [
           "arn:aws:s3:::rnd-ecs-terraform-state",
           "arn:aws:s3:::rnd-ecs-terraform-state/*"
@@ -142,60 +148,61 @@ module "ecs" {
 
 
 module "ecs_task_definition" {
-  source             = "./modules/task-definition"
+  source = "./modules/task-definition"
 
-  family             = var.container_name
-  log_group          = var.project_name
-  cpu                = var.cpu
-  memory             = var.memory
-  container_name     = var.container_name
-  image              = var.container_image
-  container_port     = var.container_port
-  region             = var.region
+  family         = var.container_name
+  log_group      = var.project_name
+  cpu            = var.cpu
+  memory         = var.memory
+  container_name = var.container_name
+  image          = var.container_image
+  container_port = var.container_port
+  region         = var.region
 
   execution_role_arn = module.iam.ecs_execution_role_arn
   task_role_arn      = module.iam.ecs_task_role_arn
-  aws_secret_arns = module.secrets.secret_arns
-  environment_vars = var.app_env_vars
+  aws_secret_arns    = module.secrets.secret_arns
+  environment_vars   = var.app_env_vars
 }
 
 module "ecs_service" {
-  source                         = "./modules/ecs_service"
+  source = "./modules/ecs_service"
 
-  name_prefix                    = "${var.project_name}-${var.environment}"
-  cluster_id                     = module.ecs.cluster_id
-  task_definition_arn           = module.ecs_task_definition.task_definition_arn
-  task_definition_family         = module.ecs_task_definition.task_definition_family
-  desired_count                 = var.desired_count
-  target_group_arn              = module.alb.target_group_arn
-  container_name                = var.container_name
-  container_port                = var.container_port
+  name_prefix            = "${var.project_name}-${var.environment}"
+  cluster_id             = module.ecs.cluster_id
+  task_definition_arn    = module.ecs_task_definition.task_definition_arn
+  task_definition_family = module.ecs_task_definition.task_definition_family
+  desired_count          = var.desired_count
+  target_group_arn       = module.alb.target_group_arn
+  container_name         = var.container_name
+  container_port         = var.container_port
 
   force_new_deployment              = true
   health_check_grace_period_seconds = 60
 
-  private_subnet_ids            = module.vpc.private_subnet_ids
-  security_group_ids            = [module.ecs_sg.security_group_id]
-  environment                   = var.environment
+  private_subnet_ids = module.vpc.private_subnet_ids
+  security_group_ids = [module.ecs_sg.security_group_id]
+  environment        = var.environment
 }
 
 
 module "alb" {
-  source              = "./modules/alb"
-  name_prefix         = "${var.project_name}-${var.environment}"
-  vpc_id              = module.vpc.vpc_id
-  public_subnet_ids   = module.vpc.public_subnet_ids
-  security_group_ids  = [module.alb_sg.security_group_id]
-  target_port         = var.container_port
-  environment         = var.environment
+  source             = "./modules/alb"
+  name_prefix        = "${var.project_name}-${var.environment}"
+  vpc_id             = module.vpc.vpc_id
+  public_subnet_ids  = module.vpc.public_subnet_ids
+  security_group_ids = [module.alb_sg.security_group_id]
+  target_port        = var.container_port
+  environment        = var.environment
+  domain_name        = var.domain_name
 }
 
 # NEW: Call the S3 module to create the artifact bucket
 module "s3_artifacts" {
   source = "./modules/s3"
 
-  bucket_name = "${var.project_name}-artifacts"     # e.g., "ecs-artifacts"
-  key_prefix  = "${var.environment}-builds"       # e.g., "dev-builds"
+  bucket_name = "${var.project_name}-artifacts" # e.g., "ecs-artifacts"
+  key_prefix  = "${var.environment}-builds"     # e.g., "dev-builds"
 }
 
 module "secrets" {

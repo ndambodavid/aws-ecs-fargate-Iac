@@ -3,6 +3,16 @@ output "alb_endpoint" {
   value       = module.alb.alb_dns_name
 }
 
+output "https_endpoint" {
+  description = "HTTPS endpoint for the application"
+  value       = "https://${var.domain_name}"
+}
+
+output "acm_validation_records" {
+  description = "Add these DNS records on Siteground to validate the ACM certificate"
+  value       = module.alb.acm_validation_records
+}
+
 # output "ecr_repository_url" {
 #   description = "The URL of the ECR repository"
 #   value       = module.ecr.repository_url
@@ -10,7 +20,7 @@ output "alb_endpoint" {
 
 output "s3_artifact_url" {
   description = "The url of the s3 artifact bucket"
-  value = module.s3_artifacts.bucket_path
+  value       = module.s3_artifacts.bucket_path
 }
 
 output "ecs_cluster_id" {
@@ -35,7 +45,7 @@ output "ecs_service_name" {
 
 output "ecs_task_family" {
   description = "ECS task family"
-  value        = module.ecs_task_definition.task_definition_family
+  value       = module.ecs_task_definition.task_definition_family
 }
 
 # --- VPC outputs for Kafka VPC peering ---

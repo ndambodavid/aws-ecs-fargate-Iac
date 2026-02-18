@@ -64,3 +64,9 @@ variable "app_env_vars" {
   type = map(string)
 }
 
+variable "domain_name" {
+  description = "Domain name for the ALB HTTPS certificate"
+  type        = string
+  default     = "mobile.ambulensi.org"
+}
+

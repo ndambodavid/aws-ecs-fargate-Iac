@@ -50,10 +50,10 @@ variable "region" {
 
 variable "aws_secret_arns" {
   description = "sensitive secret arns"
-  type = map(string)
+  type        = map(string)
 }
 
 variable "environment_vars" {
   description = "non sensitive vars"
-  type = map(string)
+  type        = map(string)
 }

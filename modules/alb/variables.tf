@@ -8,3 +8,8 @@ variable "target_port" {
 variable "environment" {
   default = "dev"
 }
+
+variable "domain_name" {
+  description = "Domain name for the ACM certificate"
+  type        = string
+}

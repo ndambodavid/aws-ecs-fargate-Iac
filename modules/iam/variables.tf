@@ -35,7 +35,7 @@ variable "create_custom_execution_policy" {
 
 variable "aws_secret_arns" {
   description = "Aws secrets arns"
-  type = map(string)
+  type        = map(string)
 }
 
 variable "custom_execution_policy_json" {
